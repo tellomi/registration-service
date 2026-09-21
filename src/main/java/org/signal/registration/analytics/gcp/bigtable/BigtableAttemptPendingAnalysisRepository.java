@@ -14,6 +14,7 @@ import com.google.cloud.bigtable.data.v2.models.TableId;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Singleton;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -29,6 +30,9 @@ import org.slf4j.LoggerFactory;
  * An "attempt pending analysis" repository that uses <a href="https://cloud.google.com/bigtable">Cloud Bigtable</a> as
  * a backing store.
  */
+// Tellomi: without a Bigtable client (e.g. the `dev` environment) this bean must not be a candidate, otherwise
+// AttemptPendingAnalysisEventListener's @Requires(bean = AttemptPendingAnalysisRepository.class) passes and injection fails.
+@Requires(bean = BigtableDataClient.class)
 @Singleton
 public class BigtableAttemptPendingAnalysisRepository implements AttemptPendingAnalysisRepository {
 

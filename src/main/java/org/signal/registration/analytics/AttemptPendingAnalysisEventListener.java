@@ -25,6 +25,7 @@ import org.signal.registration.session.SessionCompletedEvent;
  * for follow-up analysis (i.e. gathering pricing information).
  */
 @Requires(bean = AttemptPendingAnalysisRepository.class)
+@Requires(notEnv = org.signal.registration.Environments.DEVELOPMENT)   // Tellomi: no analytics store in dev
 @Singleton
 public class AttemptPendingAnalysisEventListener implements ApplicationEventListener<SessionCompletedEvent> {
 
