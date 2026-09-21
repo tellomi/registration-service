@@ -14,6 +14,8 @@ import io.micronaut.core.naming.conventions.StringConvention;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tellomi: prescribed verification codes from configuration instead of Firestore — the test-account mechanism for the
@@ -30,6 +32,8 @@ import java.util.Map;
 @Requires(missingBeans = Firestore.class)
 public class StaticPrescribedVerificationCodeRepository implements PrescribedVerificationCodeRepository {
 
+  private static final Logger logger = LoggerFactory.getLogger(StaticPrescribedVerificationCodeRepository.class);
+
   private final Map<Phonenumber.PhoneNumber, String> verificationCodes;
 
   public StaticPrescribedVerificationCodeRepository(
@@ -45,6 +49,7 @@ public class StaticPrescribedVerificationCodeRepository implements PrescribedVer
       }
     });
     this.verificationCodes = Map.copyOf(parsed);
+    logger.info("Static prescribed verification codes: {} number(s)", verificationCodes.size());
   }
 
   @Override
