@@ -56,6 +56,7 @@ public class DynamicSelector {
   private final Map<String, VerificationCodeSender> regionOverrides;
   private final Map<String, VerificationCodeSender> senders;
   private final Set<String> unavailableInRegions;
+  private final Set<String> availableOnlyInRegions;
   private final AdaptiveStrategy strategy;
   private final MeterRegistry meterRegistry;
 
@@ -96,6 +97,7 @@ public class DynamicSelector {
     this.regionOverrides = MapUtil.mapValues(config.regionOverrides(), senders::get);
 
     this.unavailableInRegions = config.unavailableInRegions();
+    this.availableOnlyInRegions = config.availableOnlyInRegions();
 
     // weighted distribution of senders for a particular region (3a).
     this.regionalDist = MapUtil.filterMapValues(
@@ -137,7 +139,8 @@ public class DynamicSelector {
 
     final String region = PhoneNumbers.regionCodeUpper(phoneNumber);
 
-    if (unavailableInRegions.contains(region)) {
+    if (unavailableInRegions.contains(region)
+        || (!availableOnlyInRegions.isEmpty() && !availableOnlyInRegions.contains(region))) {
       throw new NoSenderAvailableException();
     }
 

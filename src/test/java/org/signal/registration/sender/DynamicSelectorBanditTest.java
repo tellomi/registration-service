@@ -46,7 +46,7 @@ public class DynamicSelectorBanditTest {
         "ZZ", Map.of(TV, 10, MV, 10, A, 80));
     final Map<String, String> regionOverrides = Map.of();
     final DynamicSelectorConfiguration config = new DynamicSelectorConfiguration(
-        transport, fallbackSenders, defaultWeights, regionWeights, regionOverrides, Collections.emptySet());
+        transport, fallbackSenders, defaultWeights, regionWeights, regionOverrides, Collections.emptySet(), null);
 
     final List<VerificationCodeSender> verificationCodeSenders =
         List.of(

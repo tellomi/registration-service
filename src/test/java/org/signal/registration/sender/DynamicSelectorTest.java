@@ -94,7 +94,7 @@ public class DynamicSelectorTest {
         sortedDefaults,
         sortedOverrides,
         Collections.emptyMap(),
-        Collections.emptySet());
+        Collections.emptySet(), null);
     final DynamicSelector ts = fixedRandom(
         randomValue,
         config,
@@ -136,7 +136,7 @@ public class DynamicSelectorTest {
         Map.of(),
         Map.of(),
         regionOverrides,
-        Collections.emptySet());
+        Collections.emptySet(), null);
 
     final DynamicSelector ts = buildSelector(config, SENDERS);
     final SenderSelectionStrategy.SenderSelection actual = ts.chooseVerificationCodeSender(
@@ -174,7 +174,7 @@ public class DynamicSelectorTest {
         choice == null ? Map.of() : Map.of(choice.getName(), 1),
         Map.of(),
         Map.of(),
-        Collections.emptySet());
+        Collections.emptySet(), null);
 
     final DynamicSelector ts = buildSelector(config, SENDERS);
     final Phonenumber.PhoneNumber num = PhoneNumberUtil.getInstance().getExampleNumber("US");
@@ -191,7 +191,7 @@ public class DynamicSelectorTest {
         Map.of(),
         Map.of(),
         Map.of(),
-        Collections.emptySet());
+        Collections.emptySet(), null);
 
     final DynamicSelector ts = buildSelector(config, List.of(SENDER_FALLBACK, SENDER_A));
     final SenderSelectionStrategy.SenderSelection actual = ts.chooseVerificationCodeSender(
@@ -212,7 +212,7 @@ public class DynamicSelectorTest {
         Map.of(UNSUPPORTED.getName(), 100),
         Map.of(),
         Map.of(),
-        Collections.emptySet());
+        Collections.emptySet(), null);
 
     // sender doesn't support any languages, but use it anyway if no language is provided by the user
     final DynamicSelector ts = buildSelector(config, List.of(SENDER_FALLBACK, UNSUPPORTED));
@@ -227,6 +227,23 @@ public class DynamicSelectorTest {
   }
 
   @Test
+  public void availableOnlyInRegions() throws NoSenderAvailableException {
+    // Tellomi: allow-list —— 只放行 CN，其它地区 NoSenderAvailableException
+    final DynamicSelectorConfiguration config = new DynamicSelectorConfiguration(
+        MessageTransport.SMS,
+        List.of(SENDER_FALLBACK.getName()),
+        Map.of(),
+        Map.of(),
+        Map.of(),
+        Collections.emptySet(), java.util.Set.of("cn"));
+    final DynamicSelector ts = buildSelector(config, List.of(SENDER_FALLBACK));
+    assertEquals(SENDER_FALLBACK, ts.chooseVerificationCodeSender(PhoneNumberUtil.getInstance().getExampleNumber("CN"),
+        Collections.emptyList(), ClientType.IOS, null, Collections.emptySet()).sender());
+    org.junit.jupiter.api.Assertions.assertThrows(NoSenderAvailableException.class, () -> ts.chooseVerificationCodeSender(
+        PhoneNumberUtil.getInstance().getExampleNumber("US"), Collections.emptyList(), ClientType.IOS, null, Collections.emptySet()));
+  }
+
+  @Test
   public void noSenderAvailable() {
     final DynamicSelectorConfiguration config = new DynamicSelectorConfiguration(
         MessageTransport.SMS,
@@ -234,7 +251,7 @@ public class DynamicSelectorTest {
         Map.of(UNSUPPORTED.getName(), 100),
         Map.of(),
         Map.of(),
-        Set.of("fr"));
+        Set.of("fr"), null);
 
     final DynamicSelector ts = buildSelector(config, SENDERS);
     assertThrows(NoSenderAvailableException.class, () -> ts.chooseVerificationCodeSender(

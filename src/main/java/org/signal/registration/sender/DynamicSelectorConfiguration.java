@@ -31,7 +31,8 @@ public record DynamicSelectorConfiguration(
     Map<@NotBlank String, Integer> defaultWeights,
     Map<@NotBlank String, Map<@NotBlank String, Integer>> regionWeights,
     Map<@NotBlank String, @NotBlank String> regionOverrides,
-    @Nullable Set<@NotBlank String> unavailableInRegions
+    @Nullable Set<@NotBlank String> unavailableInRegions,
+    @Nullable Set<@NotBlank String> availableOnlyInRegions   // Tellomi: allow-list（非空时其它地区一律 NoSenderAvailable；prescribed / 虚构号段不受影响）
 ) {
 
   public DynamicSelectorConfiguration {
@@ -41,6 +42,10 @@ public record DynamicSelectorConfiguration(
       unavailableInRegions = Collections.emptySet();
     }
     unavailableInRegions = unavailableInRegions.stream().map(r -> r.toUpperCase(Locale.ROOT)).collect(Collectors.toSet());
+    if (availableOnlyInRegions == null) {
+      availableOnlyInRegions = Collections.emptySet();
+    }
+    availableOnlyInRegions = availableOnlyInRegions.stream().map(r -> r.toUpperCase(Locale.ROOT)).collect(Collectors.toSet());
   }
 
 }
