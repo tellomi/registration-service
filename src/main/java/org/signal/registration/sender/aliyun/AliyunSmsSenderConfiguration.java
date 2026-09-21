@@ -6,6 +6,7 @@ package org.signal.registration.sender.aliyun;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.core.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 
@@ -21,9 +22,9 @@ public record AliyunSmsSenderConfiguration(@NotBlank String accessKeyId,
                                            @NotBlank String accessKeySecret,
                                            @NotBlank String signName,
                                            @NotBlank String templateCode,
-                                           String templateMinutes,
-                                           String endpoint,
-                                           Duration sessionTtl) {
+                                           @Nullable String templateMinutes,
+                                           @Nullable String endpoint,
+                                           @Nullable Duration sessionTtl) {
 
   public AliyunSmsSenderConfiguration {
     if (templateMinutes == null || templateMinutes.isBlank()) {
